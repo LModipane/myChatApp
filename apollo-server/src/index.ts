@@ -7,19 +7,8 @@ import http from 'http';
 import cors from 'cors';
 import bodyParser from 'body-parser';
 import { makeExecutableSchema } from '@graphql-tools/schema';
-// import { typeDefs, resolvers } from './schema';
-
-const typeDefs = `#graphql
-    type Query {
-        hello: String
-    }
-`;
-
-const resolvers = {
-	Query: {
-		hello: () => 'Hello, world!',
-	},
-};
+import resolvers from './graphQL/resolvers/index.js';
+import typeDefs from './graphQL/typeDefs/index.js';
 
 // Define a custom context interface
 interface MyContext {
@@ -30,7 +19,8 @@ interface MyContext {
 const app = express();
 const httpServer = http.createServer(app);
 
-const schema = makeExecutableSchema({typeDefs, resolvers});
+// this is how we optimize the GraphQL schema before passing it to the apollo server
+const schema = makeExecutableSchema({ typeDefs, resolvers });
 
 // Create Apollo Server instance with a custom context and the `ApolloServerPluginDrainHttpServer` plugin
 const server = new ApolloServer<MyContext>({
@@ -52,5 +42,6 @@ app.use(
 );
 
 // Start the http server
-await new Promise<void>(resolve => httpServer.listen({ port: 4000 }, resolve));
-console.log(`🚀 Server ready at http://localhost:4000/`);
+await new Promise<void>(resolve => httpServer.listen({ port: 4000 }, resolve))
+	.then(() => console.log(`🚀 Server ready at http://localhost:4000/graphql`))
+	.catch(error => console.log(error));

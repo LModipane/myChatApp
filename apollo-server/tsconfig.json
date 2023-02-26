@@ -2,7 +2,8 @@
 	"compilerOptions": {
 		"esModuleInterop": true,
 		"module": "esnext",
-		"target": "es2017",//this allows top-level awaits in our code  
-		"moduleResolution": "nodenext"//this defines how we import modules in our files 
+		"target": "es2017", //this allows top-level awaits in our code
+		"moduleResolution": "nodenext", //this defines how we import modules in our files
+		
 	}
 }
