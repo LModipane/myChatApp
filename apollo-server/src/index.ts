@@ -1,19 +1,18 @@
 // Import necessary packages
-import { ApolloServer } from '@apollo/server';
-import { expressMiddleware } from '@apollo/server/express4';
 import { ApolloServerPluginDrainHttpServer } from '@apollo/server/plugin/drainHttpServer';
+import { expressMiddleware } from '@apollo/server/express4';
 import { makeExecutableSchema } from '@graphql-tools/schema';
-import bodyParser from 'body-parser';
-import cors from 'cors';
-import express from 'express';
-import http from 'http';
-import type {Session}  from 'next-auth';
-import { getSession } from 'next-auth/react';
 import { MyContext } from './lib/@types/resolversTypes.js';
 import resolvers from './lib/graphQL/resolvers/index.js';
 import typeDefs from './lib/graphQL/typeDefs/index.js';
+import { ApolloServer } from '@apollo/server';
+import { getSession } from 'next-auth/react';
 import prisma from './lib/prismadb.js';
-import dotenv from "dotenv";
+import bodyParser from 'body-parser';
+import express from 'express';
+import dotenv from 'dotenv';
+import cors from 'cors';
+import http from 'http';
 
 //loading in my environment variables
 dotenv.config();
