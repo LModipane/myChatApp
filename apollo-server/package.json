@@ -5,7 +5,7 @@
 	"main": "index.ts",
 	"type": "module",
 	"scripts": {
-		"start": "nodemon -x ts-node --esm src/index.ts"
+		"start": "nodemon -x ts-node --esm --files src/index.ts"
 	},
 	"keywords": [],
 	"author": "",
@@ -21,6 +21,7 @@
 		"graphql-subscriptions": "^2.0.0",
 		"graphql-ws": "^5.11.3",
 		"lodash.merge": "^4.6.2",
+		"next-auth": "^4.19.2",
 		"ts-node": "^10.9.1"
 	},
 	"devDependencies": {

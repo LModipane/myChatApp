@@ -2,15 +2,17 @@
 import { ApolloServer } from '@apollo/server';
 import { expressMiddleware } from '@apollo/server/express4';
 import { ApolloServerPluginDrainHttpServer } from '@apollo/server/plugin/drainHttpServer';
+import { makeExecutableSchema } from '@graphql-tools/schema';
+import bodyParser from 'body-parser';
+import cors from 'cors';
 import express from 'express';
 import http from 'http';
-import cors from 'cors';
-import bodyParser from 'body-parser';
-import { makeExecutableSchema } from '@graphql-tools/schema';
+import type {Session}  from 'next-auth';
+import { getSession } from 'next-auth/react';
+import { MyContext } from './lib/@types/resolversTypes.js';
 import resolvers from './lib/graphQL/resolvers/index.js';
 import typeDefs from './lib/graphQL/typeDefs/index.js';
-import { MyContext } from './lib/@types/resolversTypes.js';
-import prisma from './lib/prismadb.js'
+import prisma from './lib/prismadb.js';
 
 // Set up Express app and http server
 const app = express();
@@ -22,6 +24,7 @@ const schema = makeExecutableSchema({ typeDefs, resolvers });
 // Create Apollo Server instance with a custom context and the `ApolloServerPluginDrainHttpServer` plugin
 const server = new ApolloServer<MyContext>({
 	schema,
+	introspection: process.env.NODE_ENV !== 'production',
 	plugins: [ApolloServerPluginDrainHttpServer({ httpServer })],
 });
 
@@ -31,10 +34,17 @@ await server.start();
 // Set up middleware for Express app
 app.use(
 	'/',
-	cors<cors.CorsRequest>(),
+	cors<cors.CorsRequest>({
+		origin: 'http://localhost:3000',
+		credentials: true,
+	}),
 	bodyParser.json(),
 	expressMiddleware(server, {
-		context: async ({ req }) => ({ token: 'Shaun', prisma }),
+		context: async ({ req }): Promise<MyContext> => {
+			const session = (await getSession({ req })) as Session;
+			console.log(session.user.id);
+			return { prisma, token: 'Shaun', session };
+		},
 	}),
 );
 
