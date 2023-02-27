@@ -16,3 +16,7 @@ export type SubmitUsernameResponse = {
 	success: boolean;
 	message: string;
 };
+
+export type SearchedUsersArs = {
+	searchedUsername: string;
+}

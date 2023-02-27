@@ -1,10 +1,39 @@
 import {
 	MyContext,
+	SearchedUsersArs,
 	SubmitUsernameArgs,
 	SubmitUsernameResponse,
 } from '../../../../lib/@types/resolversTypes.js';
+import type {User} from "@prisma/client"
 
 const resolvers = {
+	Query: {
+		hello: () => 'hello world',
+		searchUsers: async (
+			_: unknown,
+			{ searchedUsername }: SearchedUsersArs,
+			{ prisma, session }: MyContext,
+		): Promise<User[]> => {
+			const { username: myUsername } = session.user;
+			try {
+				const users = await prisma.user.findMany({
+					where: {
+						username: {
+							contains: searchedUsername, // this prop inputs the username into the search
+							not: myUsername as string, //this prop always use to not search for our users name
+							mode: 'insensitive', //this prop always us to ignore the casing of our search
+						}, //this tells prisma what we are looking for
+					},
+				}); //look here
+
+				return users;
+			} catch (error: any) {
+				//this any is here because it will be too much work and little reward to tell typescript that the error objects comes with a message prop
+				console.log('search users error: ', error);
+				throw new Error(error.message);
+			}
+		},
+	},
 	Mutation: {
 		submitUsername: async (
 			_: unknown,
@@ -44,10 +73,6 @@ const resolvers = {
 				};
 			}
 		},
-	},
-
-	Query: {
-		hello: () => 'hello world',
 	},
 };
 
