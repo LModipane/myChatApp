@@ -13,6 +13,10 @@ import { MyContext } from './lib/@types/resolversTypes.js';
 import resolvers from './lib/graphQL/resolvers/index.js';
 import typeDefs from './lib/graphQL/typeDefs/index.js';
 import prisma from './lib/prismadb.js';
+import dotenv from "dotenv";
+
+//loading in my environment variables
+dotenv.config();
 
 // Set up Express app and http server
 const app = express();
@@ -35,14 +39,13 @@ await server.start();
 app.use(
 	'/',
 	cors<cors.CorsRequest>({
-		origin: 'http://localhost:3000',
+		origin: process.env.CLIENT_ORIGIN,
 		credentials: true,
 	}),
 	bodyParser.json(),
 	expressMiddleware(server, {
 		context: async ({ req }): Promise<MyContext> => {
-			const session = (await getSession({ req })) as Session;
-			console.log(session.user.id);
+			const session = await getSession({ req });
 			return { prisma, token: 'Shaun', session };
 		},
 	}),

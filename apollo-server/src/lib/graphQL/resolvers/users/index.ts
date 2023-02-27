@@ -18,12 +18,12 @@ const resolvers = {
 					message: 'Not authenticated, please sign in',
 				};
 			}
-			// console.log(session.user.id);
+
 			try {
-				// const { id: myUserId } = session.user;
+				const { id: myUserId } = session?.user;
 				await prisma.user.update({
 					where: {
-						id: "shun"
+						id: myUserId as string,
 					}, //this prop selects the id we want to update
 					data: {
 						username,
