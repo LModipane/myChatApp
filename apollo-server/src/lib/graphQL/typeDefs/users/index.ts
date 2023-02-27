@@ -9,10 +9,10 @@ const typeDefs = `#graphql
     }
     type Query {
         hello: String
-        searchUsers(searchedUsername: String!): [SearchedUsers]
+        searchUsers(searchedUsername: String!): [SearchedUser]
     }#for some reason apollo wanted a query endpoint for the server to work 
 
-    type SearchedUsers{
+    type SearchedUser{
         id: ID!
         username: String!
     }
