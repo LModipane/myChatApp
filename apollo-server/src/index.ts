@@ -7,13 +7,10 @@ import http from 'http';
 import cors from 'cors';
 import bodyParser from 'body-parser';
 import { makeExecutableSchema } from '@graphql-tools/schema';
-import resolvers from './graphQL/resolvers/index.js';
-import typeDefs from './graphQL/typeDefs/index.js';
-
-// Define a custom context interface
-interface MyContext {
-	token?: string;
-}
+import resolvers from './lib/graphQL/resolvers/index.js';
+import typeDefs from './lib/graphQL/typeDefs/index.js';
+import { MyContext } from './lib/@types/resolversTypes.js';
+import prisma from './lib/prismadb.js'
 
 // Set up Express app and http server
 const app = express();
@@ -37,7 +34,7 @@ app.use(
 	cors<cors.CorsRequest>(),
 	bodyParser.json(),
 	expressMiddleware(server, {
-		context: async ({ req }) => ({ token: req.headers.token }),
+		context: async ({ req }) => ({ token: 'Shaun', prisma }),
 	}),
 );
 
