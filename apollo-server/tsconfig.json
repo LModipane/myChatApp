@@ -1,6 +1,12 @@
 {
 	"compilerOptions": {
 		"esModuleInterop": true,
+		"allowJs": true,
+		"skipLibCheck": true,
+		"strict": false,
+		"noEmit": true,
+		"isolatedModules": true,
+		"incremental": true,
 		"module": "esnext",
 		"target": "es2017", //this allows top-level awaits in our code
 		"moduleResolution": "nodenext" //this defines how we import modules in our files
