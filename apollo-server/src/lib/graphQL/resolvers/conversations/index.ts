@@ -50,7 +50,7 @@ const resolvers = {
 		createConversation: async (
 			_: unknown,
 			{ addedUserIds }: CreateConversationArgs,
-			{ prisma, session }: MyContext,
+			{ prisma, session, pubsub }: MyContext,
 		): Promise<{ conversationId: string }> => {
 			if (!session) throw new ApolloError('Not authorised, please sign in');
 
@@ -76,12 +76,24 @@ const resolvers = {
 				/**
 				 * publish created coversation event
 				 */
+
+				pubsub.publish('CONVERSATION_CREATED', {
+					conversatioinCreated: conversation,
+				});
+
 				console.log(conversation.id);
 				return { conversationId: conversation.id };
 			} catch (error) {
 				console.log('opps, created conversation error: ', error);
 				throw new ApolloError('failed to create conversation');
 			}
+		},
+	},
+	Subscription: {
+		conversationCreated: {
+			subscribe: (_: unknown, __: unknown, { pubsub }: MyContext) => {
+				return pubsub.asyncIterator(['CONVERSATION_CREATED']);
+			},
 		},
 	},
 };

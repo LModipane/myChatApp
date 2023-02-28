@@ -28,6 +28,10 @@ const typeDefs = `#graphql
         hasSeenLatestMessage: Boolean
     }
 
+    type Subscription {
+        conversationCreated: Conversation
+    }
+
 `;
 
 export default typeDefs;
