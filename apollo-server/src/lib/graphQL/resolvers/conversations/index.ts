@@ -1,10 +1,51 @@
 import {
 	CreateConversationArgs,
 	MyContext,
+	Conversation,
 } from '../../../@types/resolversTypes.js';
 import { ApolloError } from 'apollo-server-core';
 import { Prisma } from '@prisma/client';
 const resolvers = {
+	Query: {
+		conversations: async (
+			_: unknown,
+			__: unknown,
+			{ prisma, session }: MyContext,
+		): Promise<Conversation[]> => {
+			if (!session) throw new ApolloError('Not authorised, please sign in');
+			const myUserId = session.user.id;
+			try {
+				/**
+				 * Find all conversation the myUser is a member of
+				 */
+				const conversations = await prisma.conversation.findMany({
+					/**
+					 * Below is the correct query to find all conversations that myUser is a member of
+					 * confirmed by the prisma team. They have confiremed this is an issue on thier end
+					 * which is specfic with mongodb
+					 */
+					// where: {
+					// 	addedUsers: {
+					// 		some: {
+					// 			userId: {
+					// 				equals: myUserId as string,
+					// 			}
+					// 		}
+					// 	}
+					// },
+					include: populatedConversation,
+				});
+
+				return conversations.filter(
+					conversation =>
+						!conversation.addedUsers.find(user => user.id === myUserId),
+				);
+			} catch (error) {
+				console.log('opps, query conversations: ', error);
+				throw new ApolloError('failed to query conversations');
+			}
+		},
+	},
 	Mutation: {
 		createConversation: async (
 			_: unknown,
@@ -47,7 +88,7 @@ const resolvers = {
 
 export default resolvers;
 
-const populatedAddedUsers =
+export const populatedAddedUsers =
 	Prisma.validator<Prisma.ConversationMemberInclude>()({
 		user: {
 			select: {
@@ -57,7 +98,7 @@ const populatedAddedUsers =
 		},
 	});
 
-const populatedConversation = Prisma.validator<Prisma.ConversationInclude>()({
+export const populatedConversation = Prisma.validator<Prisma.ConversationInclude>()({
 	addedUsers: {
 		include: populatedAddedUsers,
 	},
@@ -71,4 +112,4 @@ const populatedConversation = Prisma.validator<Prisma.ConversationInclude>()({
 			},
 		},
 	},
-});
+});//this is exported so that it is available in the prisma object 

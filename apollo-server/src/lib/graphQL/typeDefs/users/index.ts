@@ -17,5 +17,14 @@ const typeDefs = `#graphql
         username: String!
     }
 
+    type User{
+        id: ID!
+        username: String
+        email: String
+        emailVerified: boolean
+        image: String
+        name: String
+    }
+
 `;
 export default typeDefs;

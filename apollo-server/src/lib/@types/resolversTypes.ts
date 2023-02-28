@@ -1,5 +1,6 @@
-import type { PrismaClient } from '@prisma/client';
+import type { PrismaClient, Prisma } from "@prisma/client";
 import type { Session } from 'next-auth';
+import { populatedConversation } from "../graphQL/resolvers/conversations/index.js";
 
 export type MyContext = {
 	token?: string;
@@ -19,8 +20,12 @@ export type SubmitUsernameResponse = {
 
 export type SearchedUsersArs = {
 	searchedUsername: string;
-}
+};
 
 export type CreateConversationArgs = {
-	addedUserIds: [string]
+	addedUserIds: [string];
 };
+
+export type Conversation = Prisma.ConversationGetPayload<{
+	include: typeof populatedConversation
+}>;
