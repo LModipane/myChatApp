@@ -4,7 +4,7 @@ import {
 	SubmitUsernameArgs,
 	SubmitUsernameResponse,
 } from '../../../../lib/@types/resolversTypes.js';
-import type {User} from "@prisma/client"
+import type { User } from '@prisma/client';
 
 const resolvers = {
 	Query: {
@@ -14,7 +14,10 @@ const resolvers = {
 			{ searchedUsername }: SearchedUsersArs,
 			{ prisma, session }: MyContext,
 		): Promise<User[]> => {
+			if (!session) throw new Error('Not autherised, please sign in');
+
 			const { username: myUsername } = session.user;
+
 			try {
 				const users = await prisma.user.findMany({
 					where: {
