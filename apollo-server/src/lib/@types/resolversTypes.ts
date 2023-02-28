@@ -20,3 +20,7 @@ export type SubmitUsernameResponse = {
 export type SearchedUsersArs = {
 	searchedUsername: string;
 }
+
+export type CreateConversationArgs = {
+	addedUsersIds: [string]
+};
