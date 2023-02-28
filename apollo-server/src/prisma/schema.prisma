@@ -62,7 +62,7 @@ model Conversation {
   updateAt        DateTime             @updatedAt
   addedUsers      ConversationMember[]
   Message         Message[]
-  latestMessageId String               @unique @db.ObjectId
+  latestMessageId String?              @unique @db.ObjectId
   latestMesssage  Message?             @relation(name: "latestConversation", fields: [latestMessageId], references: [id], onDelete: NoAction, onUpdate: NoAction)
 }
 
