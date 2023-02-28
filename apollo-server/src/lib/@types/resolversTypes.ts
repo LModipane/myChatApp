@@ -22,5 +22,5 @@ export type SearchedUsersArs = {
 }
 
 export type CreateConversationArgs = {
-	addedUsersIds: [string]
+	addedUserIds: [string]
 };

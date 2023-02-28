@@ -8,14 +8,14 @@ const resolvers = {
 	Mutation: {
 		createConversation: async (
 			_: unknown,
-			{ addedUsersIds }: CreateConversationArgs,
+			{ addedUserIds }: CreateConversationArgs,
 			{ prisma, session }: MyContext,
 		): Promise<{ conversationId: string }> => {
 			if (!session) throw new ApolloError('Not authorised, please sign in');
 
 			const { id: myUserId } = session.user;
 
-			const conversationMembers = addedUsersIds.map(id => ({
+			const conversationMembers = addedUserIds.map(id => ({
 				userId: id,
 				hasSeenLatestMessage: id === myUserId,
 			}));
@@ -33,9 +33,9 @@ const resolvers = {
 				});
 
 				/**
-				 * publish created coversation event 
+				 * publish created coversation event
 				 */
-
+				console.log(conversation.id);
 				return { conversationId: conversation.id };
 			} catch (error) {
 				console.log('opps, created conversation error: ', error);

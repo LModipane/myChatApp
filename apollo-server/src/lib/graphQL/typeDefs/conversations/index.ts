@@ -1,7 +1,7 @@
 const typeDefs = `#graphql
 
     type Mutation {
-        createConversation(addedUsersIds:[String!]!): CreateConversationResponse
+        createConversation(addedUserIds:[String!]!): CreateConversationResponse
     }
 
     type CreateConversationResponse {
