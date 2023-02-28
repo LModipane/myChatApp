@@ -21,7 +21,7 @@ const typeDefs = `#graphql
         id: ID!
         username: String
         email: String
-        emailVerified: boolean
+        emailVerified: Boolean
         image: String
         name: String
     }

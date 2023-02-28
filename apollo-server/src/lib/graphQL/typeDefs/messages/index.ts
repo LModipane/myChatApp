@@ -4,7 +4,7 @@ const typeDefs = `#graphql
         createAt: Date
         id: ID!
         sender: User
-        body: string
+        body: String
     }
 `;
 

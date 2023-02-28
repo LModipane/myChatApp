@@ -1,6 +1,6 @@
 const typeDefs = `#graphql
 
-    scalar Data
+    scalar Date
 
     type Mutation {
         createConversation(addedUserIds:[String!]!): CreateConversationResponse
@@ -18,14 +18,14 @@ const typeDefs = `#graphql
         id: ID!
         latestMessage: Message
         addedUsers: [AddedUser]
-        createAt: Data
-        updatedAt: Data
+        createAt: Date
+        updatedAt: Date
     }
 
     type AddedUser {
         id: ID!
         user: User
-        hasSeenLatestMessage: boolean
+        hasSeenLatestMessage: Boolean
     }
 
 `;

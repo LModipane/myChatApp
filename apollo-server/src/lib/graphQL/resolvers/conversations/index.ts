@@ -98,18 +98,19 @@ export const populatedAddedUsers =
 		},
 	});
 
-export const populatedConversation = Prisma.validator<Prisma.ConversationInclude>()({
-	addedUsers: {
-		include: populatedAddedUsers,
-	},
-	latestMesssage: {
-		include: {
-			sender: {
-				select: {
-					id: true,
-					username: true,
+export const populatedConversation =
+	Prisma.validator<Prisma.ConversationInclude>()({
+		addedUsers: {
+			include: populatedAddedUsers,
+		},
+		latestMesssage: {
+			include: {
+				sender: {
+					select: {
+						id: true,
+						username: true,
+					},
 				},
 			},
 		},
-	},
-});//this is exported so that it is available in the prisma object 
+	}); //this is exported so that it is available in the prisma object
