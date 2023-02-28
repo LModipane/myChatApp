@@ -38,9 +38,11 @@ model User {
   id            String               @id @default(auto()) @map("_id") @db.ObjectId
   name          String?
   email         String?              @unique
-  username      String?              @unique  //Look here
+  username      String?              @unique //Look here
   emailVerified DateTime?
   image         String?
+  conversation  ConversationMember[]
+  messages      Message[]
   accounts      Account[]
   sessions      Session[]
 }
@@ -52,4 +54,34 @@ model VerificationToken {
   expires    DateTime
 
   @@unique([identifier, token])
+}
+
+model Conversation {
+  id              String               @id @default(auto()) @map("_id") @db.ObjectId
+  creeateAt       DateTime             @default(now())
+  updateAt        DateTime             @updatedAt
+  addedUsers      ConversationMember[]
+  Message         Message[]
+  latestMessageId String               @unique @db.ObjectId
+  latestMesssage  Message?             @relation(name: "latestConversation", fields: [latestMessageId], references: [id], onDelete: NoAction, onUpdate: NoAction)
+}
+
+model ConversationMember {
+  id                   String       @id @default(auto()) @map("_id") @db.ObjectId
+  userId               String       @db.ObjectId
+  user                 User         @relation(fields: [userId], references: [id])
+  conversationId       String       @db.ObjectId
+  conversations        Conversation @relation(fields: [conversationId], references: [id])
+  hasSeenLatestMessage Boolean
+}
+
+model Message {
+  id             String        @id @default(auto()) @map("_id") @db.ObjectId
+  creeateAt      DateTime      @default(now())
+  updateAt       DateTime      @updatedAt
+  senderId       String        @db.ObjectId
+  sender         User          @relation(fields: [senderId], references: [id])
+  conversationId String        @db.ObjectId
+  conversation   Conversation  @relation(fields: [conversationId], references: [id])
+  isLatestIn     Conversation? @relation(name: "latestConversation")
 }
