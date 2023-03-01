@@ -84,4 +84,5 @@ model Message {
   conversationId String        @db.ObjectId
   conversation   Conversation  @relation(fields: [conversationId], references: [id])
   isLatestIn     Conversation? @relation(name: "latestConversation")
+  body           String
 }
