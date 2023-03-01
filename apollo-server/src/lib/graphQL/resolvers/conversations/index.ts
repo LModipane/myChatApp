@@ -2,9 +2,11 @@ import {
 	CreateConversationArgs,
 	MyContext,
 	Conversation,
+	ConversationCreatedSubscriptionPayload,
 } from '../../../@types/resolversTypes.js';
 import { ApolloError } from 'apollo-server-core';
 import { Prisma } from '@prisma/client';
+import { withFilter } from 'graphql-subscriptions';
 const resolvers = {
 	Query: {
 		conversations: async (
@@ -13,7 +15,7 @@ const resolvers = {
 			{ prisma, session }: MyContext,
 		): Promise<Conversation[]> => {
 			if (!session) throw new ApolloError('Not authorised, please sign in');
-			const myUserId = session.user.id;
+			const myUserId = session.user.id as string;
 			try {
 				/**
 				 * Find all conversation the myUser is a member of
@@ -38,7 +40,9 @@ const resolvers = {
 
 				return conversations.filter(
 					conversation =>
-						!conversation.addedUsers.find(user => user.id === myUserId),
+						!!conversation.addedUsers.find(
+							addedUser => addedUser.userId === myUserId,
+						),
 				);
 			} catch (error) {
 				console.log('opps, query conversations: ', error);
@@ -76,7 +80,7 @@ const resolvers = {
 				/**
 				 * publish created coversation event
 				 */
-				
+
 				pubsub.publish('CONVERSATION_CREATED', {
 					conversationCreated: conversation,
 				});
@@ -90,9 +94,23 @@ const resolvers = {
 	},
 	Subscription: {
 		conversationCreated: {
-			subscribe: (_: unknown, __: unknown, { pubsub }: MyContext) => {
-				return pubsub.asyncIterator(['CONVERSATION_CREATED']);
-			},
+			subscribe: withFilter(
+				(_: unknown, __: unknown, { pubsub }: MyContext) => {
+					return pubsub.asyncIterator(['CONVERSATION_CREATED']);
+				},
+				(
+					payload: ConversationCreatedSubscriptionPayload,
+					_: unknown,
+					{ session }: MyContext,
+				) => {
+					const { id: myUserId } = session.user;
+					const { addedUsers } = payload.conversationCreated;
+					const isMyUserInConversation = !!addedUsers.find(
+						addedUser => addedUser.userId === myUserId,
+					);
+					return isMyUserInConversation;
+				},
+			),
 		},
 	},
 };

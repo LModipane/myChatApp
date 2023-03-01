@@ -38,3 +38,7 @@ export interface SubscriptionContext extends Context {
 		session?: Session
 	}
 }
+
+export type ConversationCreatedSubscriptionPayload = {
+	conversationCreated: Conversation
+}
