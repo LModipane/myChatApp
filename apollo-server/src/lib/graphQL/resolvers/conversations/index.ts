@@ -76,12 +76,11 @@ const resolvers = {
 				/**
 				 * publish created coversation event
 				 */
-
+				
 				pubsub.publish('CONVERSATION_CREATED', {
-					conversatioinCreated: conversation,
+					conversationCreated: conversation,
 				});
 
-				console.log(conversation.id);
 				return { conversationId: conversation.id };
 			} catch (error) {
 				console.log('opps, created conversation error: ', error);
