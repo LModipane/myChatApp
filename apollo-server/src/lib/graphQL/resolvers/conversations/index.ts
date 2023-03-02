@@ -4,7 +4,7 @@ import {
 	Conversation,
 	ConversationCreatedSubscriptionPayload,
 } from '../../../@types/resolversTypes.js';
-import { ApolloError } from 'apollo-server-core';
+import { GraphQLError } from 'graphql';
 import { Prisma } from '@prisma/client';
 import { withFilter } from 'graphql-subscriptions';
 const resolvers = {
@@ -14,7 +14,7 @@ const resolvers = {
 			__: unknown,
 			{ prisma, session }: MyContext,
 		): Promise<Conversation[]> => {
-			if (!session) throw new ApolloError('Not authorised, please sign in');
+			if (!session) throw new GraphQLError('Not authorised, please sign in');
 			const myUserId = session.user.id as string;
 			try {
 				/**
@@ -46,7 +46,7 @@ const resolvers = {
 				);
 			} catch (error) {
 				console.log('opps, query conversations: ', error);
-				throw new ApolloError('failed to query conversations');
+				throw new GraphQLError('failed to query conversations');
 			}
 		},
 	},
@@ -56,7 +56,7 @@ const resolvers = {
 			{ addedUserIds }: CreateConversationArgs,
 			{ prisma, session, pubsub }: MyContext,
 		): Promise<{ conversationId: string }> => {
-			if (!session) throw new ApolloError('Not authorised, please sign in');
+			if (!session) throw new GraphQLError('Not authorised, please sign in');
 
 			const { id: myUserId } = session.user;
 
@@ -88,7 +88,7 @@ const resolvers = {
 				return { conversationId: conversation.id };
 			} catch (error) {
 				console.log('opps, created conversation error: ', error);
-				throw new ApolloError('failed to create conversation');
+				throw new GraphQLError('failed to create conversation');
 			}
 		},
 	},
