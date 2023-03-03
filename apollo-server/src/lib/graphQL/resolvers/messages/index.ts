@@ -1,6 +1,12 @@
 import { Prisma } from '@prisma/client';
 import { GraphQLError } from 'graphql';
-import { MyContext, SendMessageArgs } from '../../../@types/resolversTypes.js';
+import { withFilter } from 'graphql-subscriptions';
+import {
+	MessageSentArgs,
+	MessageSentSubscriptionPayload,
+	MyContext,
+	SendMessageArgs,
+} from '../../../@types/resolversTypes.js';
 
 const resolvers = {
 	Query: {},
@@ -60,24 +66,37 @@ const resolvers = {
 					},
 				});
 				/**
-				 * publish update conversation event and message sent event 
+				 * publish update conversation event and message sent event
 				 */
-				pubsub.publish("MESSAGE_SENT", {
-					messageSent: newMessage
-				})
-				pubsub.publish("CONVERSATION_UPDATED", {
-					conversationUpdated: {conversation}
-				})
-
+				pubsub.publish('MESSAGE_SENT', {
+					messageSent: newMessage,
+				});
+				// pubsub.publish("CONVERSATION_UPDATED", {
+				// 	conversationUpdated: {conversation}
+				// })
 			} catch (error) {
-				console.log("Opps sendMessage error: ", error)
-				throw new Error("failed to send message")
+				console.log('Opps sendMessage error: ', error);
+				throw new Error('failed to send message');
 			}
 
 			return true;
 		},
 	},
-	Subscription: {},
+	Subscription: {
+		messageSent: {
+			subscribe: withFilter(
+				(_: unknown, __: unknown, { pubsub }: MyContext) => {
+					return pubsub.asyncIterator(['MESSAGE_SENT']);
+				},
+				(
+					payload: MessageSentSubscriptionPayload,
+					{ conversationId }: MessageSentArgs,
+				) => {
+					return payload.messageSent.conversationId === conversationId;
+				},
+			),
+		},
+	},
 };
 
 export default resolvers;

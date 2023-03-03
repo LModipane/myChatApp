@@ -6,6 +6,7 @@ import {
 	populatedAddedUsers,
 	populatedConversation,
 } from '../graphQL/resolvers/conversations/index.js';
+import { populatedMessage } from  "../graphQL/resolvers/messages/index.js"
 
 export type MyContext = {
 	token?: string;
@@ -56,3 +57,15 @@ export type SendMessageArgs = {
 	conversationId: string;
 	body: string;
 };
+
+export type MessageSentSubscriptionPayload = {
+	messageSent: PopulatedMessage;
+};
+
+export type PopulatedMessage = Prisma.MessageGetPayload<{
+	include: typeof populatedMessage
+}>
+
+export type MessageSentArgs = {
+	conversationId: string
+}
