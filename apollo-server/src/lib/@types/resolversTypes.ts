@@ -69,3 +69,7 @@ export type PopulatedMessage = Prisma.MessageGetPayload<{
 export type MessageSentArgs = {
 	conversationId: string
 }
+
+export type MessagesArgs = {
+	conversationId: string
+}

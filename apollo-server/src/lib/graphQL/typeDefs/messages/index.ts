@@ -7,6 +7,10 @@ const typeDefs = `#graphql
         body: String
     }
 
+    type Query {
+        messages(conversationId: string): [Message] 
+    }
+
     type Mutation {
         sendMessage(messageId: ID!, conversationId: ID!, senderId:ID!, body: String): Boolean
     }

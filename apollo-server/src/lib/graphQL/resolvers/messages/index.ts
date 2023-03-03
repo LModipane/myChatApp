@@ -2,14 +2,65 @@ import { Prisma } from '@prisma/client';
 import { GraphQLError } from 'graphql';
 import { withFilter } from 'graphql-subscriptions';
 import {
+	MessagesArgs,
 	MessageSentArgs,
 	MessageSentSubscriptionPayload,
 	MyContext,
+	PopulatedMessage,
 	SendMessageArgs,
 } from '../../../@types/resolversTypes.js';
+import { userIsConversationMember } from '../../../utils/functions.js';
+import { populatedConversation } from '../conversations/index.js';
 
 const resolvers = {
-	Query: {},
+	Query: {
+		messages: async (
+			_: unknown,
+			{ conversationId }: MessagesArgs,
+			{ prisma, session }: MyContext,
+		): Promise<PopulatedMessage[]> => {
+			if (!session) throw new GraphQLError('Not Authorised');
+			const { id: myUserId } = session.user;
+
+			const conversation = await prisma.conversation.findUnique({
+				where: {
+					id: conversationId,
+				},
+				include: populatedConversation,
+			});
+			/**
+			 * verify that the conversation exist and myUser can view messages
+			 */
+			if (!conversation) throw new GraphQLError('Conversation not found');
+
+			const { addedUsers } = conversation;
+			const allowToViewMessage = userIsConversationMember(
+				addedUsers,
+				myUserId as string,
+			);
+			if (!allowToViewMessage) throw new GraphQLError('Not authorized');
+
+			/**
+			 * fetch messages
+			 */
+
+			try {
+				const messages = await prisma.message.findMany({
+					where: {
+						conversationId,
+					},
+					include: populatedMessage,
+					orderBy: {
+						creeateAt: 'desc',
+					},
+				});
+				return messages;
+			} catch (error) {
+				console.log('Opps, messages error: ', error);
+				throw new GraphQLError('failed to fetch messages');
+			}
+		},
+	},
 	Mutation: {
 		sendMessage: async (
 			_: unknown,
