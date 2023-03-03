@@ -2,7 +2,7 @@ import type { PrismaClient, Prisma } from "@prisma/client";
 import { PubSub } from "graphql-subscriptions";
 import { Context } from "graphql-ws";
 import type { Session } from 'next-auth';
-import { populatedConversation } from "../graphQL/resolvers/conversations/index.js";
+import { populatedAddedUsers, populatedConversation } from "../graphQL/resolvers/conversations/index.js";
 
 export type MyContext = {
 	token?: string;
@@ -31,6 +31,10 @@ export type CreateConversationArgs = {
 
 export type Conversation = Prisma.ConversationGetPayload<{
 	include: typeof populatedConversation
+}>;
+
+export type AddedUser = Prisma.ConversationMemberGetPayload<{
+	include: typeof populatedAddedUsers;
 }>;
 
 export interface SubscriptionContext extends Context {
