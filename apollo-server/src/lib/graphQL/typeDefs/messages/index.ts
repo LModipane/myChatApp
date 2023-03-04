@@ -8,7 +8,7 @@ const typeDefs = `#graphql
     }
 
     type Query {
-        messages(conversationId: string): [Message] 
+        messages(conversationId: String): [Message] 
     }
 
     type Mutation {
