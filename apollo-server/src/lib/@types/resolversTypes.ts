@@ -52,7 +52,6 @@ export type ConversationCreatedSubscriptionPayload = {
 };
 
 export type SendMessageArgs = {
-	messageId: string;
 	senderId: string;
 	conversationId: string;
 	body: string;

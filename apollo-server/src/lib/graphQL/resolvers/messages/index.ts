@@ -64,9 +64,10 @@ const resolvers = {
 	Mutation: {
 		sendMessage: async (
 			_: unknown,
-			{ messageId, body, conversationId, senderId }: SendMessageArgs,
+			{ body, conversationId, senderId }: SendMessageArgs,
 			{ prisma, session, pubsub }: MyContext,
 		): Promise<boolean> => {
+			console.log('hello');
 			if (!session) throw new GraphQLError('Not Authorised');
 			const { id: myUserId } = session.user;
 			if (myUserId !== senderId) throw new GraphQLError('Not Authorised'); //this prevents other users from sending messages for outher users
@@ -77,13 +78,26 @@ const resolvers = {
 				 */
 				const newMessage = await prisma.message.create({
 					data: {
-						id: messageId,
 						senderId,
 						conversationId,
 						body,
 					},
 					include: populatedMessage,
 				});
+
+				/**
+				 * we need to added the senderId in the conversation Member
+				 * we need to find the converssatiom Member that sender Id belongs to
+				 */
+
+				const conversationMember = await prisma.conversationMember.findFirst({
+					where: {
+						userId: myUserId as string,
+						conversationId,
+					},
+				});
+				if (!conversationMember)
+					throw new GraphQLError('added user does not exist ');
 
 				/**
 				 * update conversation object to incluse the new message
@@ -97,7 +111,7 @@ const resolvers = {
 						addedUsers: {
 							update: {
 								where: {
-									id: senderId,
+									id: conversationMember.id,
 								},
 								data: {
 									hasSeenLatestMessage: true,
@@ -106,7 +120,7 @@ const resolvers = {
 							updateMany: {
 								where: {
 									NOT: {
-										userId: senderId,
+										userId: myUserId as string,
 									},
 								},
 								data: {
@@ -115,7 +129,10 @@ const resolvers = {
 							},
 						},
 					},
+					include: populatedConversation,
 				});
+				console.log(conversation);
+				
 				/**
 				 * publish update conversation event and message sent event
 				 */
@@ -125,12 +142,12 @@ const resolvers = {
 				// pubsub.publish("CONVERSATION_UPDATED", {
 				// 	conversationUpdated: {conversation}
 				// })
+
+				return true;
 			} catch (error) {
 				console.log('Opps sendMessage error: ', error);
 				throw new Error('failed to send message');
 			}
-
-			return true;
 		},
 	},
 	Subscription: {

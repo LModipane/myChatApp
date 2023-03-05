@@ -12,7 +12,7 @@ const typeDefs = `#graphql
     }
 
     type Mutation {
-        sendMessage(messageId: ID!, conversationId: ID!, senderId:ID!, body: String): Boolean
+        sendMessage(conversationId: ID!, senderId:ID!, body: String!): Boolean
     }
 
     type Subscription {
